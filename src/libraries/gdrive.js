@@ -1,74 +1,62 @@
-import {join} from 'path';
-import {promises as fs} from 'fs';
-import {promisify} from 'util';
-import {google} from 'googleapis';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { promises as fs } from 'fs';
+import { google } from 'googleapis';
+import { EventEmitter } from 'events';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
+const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const TOKEN_PATH = join(__dirname, '..', 'token.json');
+const PORT = 3000;
 
 class GoogleAuth extends EventEmitter {
-  constructor() {
-    super();
-  }
-
   async authorize(credentials) {
+    const { client_secret, client_id } = credentials;
+
+    const oAuth2Client = new google.auth.OAuth2(
+      client_id,
+      client_secret,
+      `http://localhost:${PORT}`
+    );
+
     let token;
-    const {client_secret, client_id} = credentials;
-    const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, `http://localhost:${port}`);
+
     try {
       token = JSON.parse(await fs.readFile(TOKEN_PATH));
-    } catch (e) {
+      oAuth2Client.setCredentials(token);
+    } catch {
       const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES,
       });
+
       this.emit('auth', authUrl);
-      const code = await promisify(this.once).bind(this)('token');
-      token = await oAuth2Client.getToken(code);
-      await fs.writeFile(TOKEN_PATH, JSON.stringify(token));
-    } finally {
-      await oAuth2Client.setCredentials(token);
+
+      const code = await new Promise(resolve =>
+        this.once('token', resolve)
+      );
+
+      const { tokens } = await oAuth2Client.getToken(code);
+      oAuth2Client.setCredentials(tokens);
+
+      await fs.writeFile(TOKEN_PATH, JSON.stringify(tokens));
     }
+
+    return oAuth2Client;
   }
 
-  token(code) {
+  sendToken(code) {
     this.emit('token', code);
   }
 }
 
 class GoogleDrive extends GoogleAuth {
-  constructor() {
-    super();
-    this.path = '/drive/api';
-  }
-
-  async getFolderID(path) {
-
-  }
-
-  async infoFile(path) {
-
-  }
-
-  async folderList(path) {
-
-  }
-
-  async downloadFile(path) {
-
-  }
-
-  async uploadFile(path) {
-
+  async getDrive(credentials) {
+    const auth = await this.authorize(credentials);
+    return google.drive({ version: 'v3', auth });
   }
 }
 
-export {
-  GoogleAuth,
-  GoogleDrive,
-};
+export { GoogleAuth, GoogleDrive };
