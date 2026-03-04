@@ -17,14 +17,18 @@ const handler = async (m, { conn, usedPrefix, command }) => {
 
     if (!fileUrl) throw "Error subiendo imagen"
 
+    // API alternativa funcional
     const response = await axios.get(
-      `https://api.stellarwa.xyz/tools/upscale?url=${fileUrl}&key=BrunoSobrino`,
-      { responseType: "arraybuffer", validateStatus: () => true }
+      `https://vihangayt.me/tools/upscale?url=${fileUrl}`,
+      {
+        responseType: "arraybuffer",
+        validateStatus: () => true
+      }
     )
 
     if (response.status !== 200) {
       console.log(response.data.toString())
-      throw "La API falló"
+      throw "La API devolvió error"
     }
 
     await conn.sendMessage(
