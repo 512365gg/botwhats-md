@@ -53,8 +53,8 @@ global.tiempo = d.toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', s
 //* ****************************
 global.wm2 = `${dia} ${fecha}\nNino Nakano - Bot`;
 global.gt = 'Nino Nakano - Bot';
-global.mysticbot = 'Nino Nakano - Bot';
-global.channel = 'https://whatsapp.com/channel/0029Vaein6eInlqIsCXpDs3y';
+global.botname = 'Nino Nakano - Bot';
+global.channel = '';
 global.md = 'https://github.com/MINORURAKUEN/Best-Nino-MD';
 global.mysticbot = 'https://github.com/MINORURAKUEN/Best-Nino-MD';
 global.waitt = '*_[ ⏳ ] Cargando..._*';
