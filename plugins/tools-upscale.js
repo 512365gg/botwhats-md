@@ -3,43 +3,42 @@ import axios from "axios"
 import uploadImage from "../src/libraries/uploadImage.js"
 
 const handler = async (m, { conn, usedPrefix, command }) => {
-  const idioma = global.db.data.users[m.sender].language || global.defaultLenguaje
-  const _translate = JSON.parse(fs.readFileSync(`./src/languages/${idioma}.json`))
-  const tradutor = _translate.plugins.herramientas_hd
-
   try {
-    const q = m.quoted ? m.quoted : m
-    const mime = (q.msg || q).mimetype || q.mediaType || ""
+    const user = global.db.data.users[m.sender] || {}
+    const idioma = user.language || global.defaultLenguaje
+    const _translate = JSON.parse(fs.readFileSync(`./src/languages/${idioma}.json`))
+    const tradutor = _translate.plugins.herramientas_hd
 
-    if (!mime) throw `${tradutor.texto1} ${usedPrefix + command}*`
-    if (!/image\/(jpe?g|png)/.test(mime)) throw `${tradutor.texto2[0]} (${mime}) ${tradutor.texto2[1]}`
+    const q = m.quoted ? m.quoted : m
+    const mime = (q.msg || q).mimetype || ""
+
+    if (!mime || !mime.startsWith("image/"))
+      throw `${tradutor.texto1} ${usedPrefix + command}`
 
     m.reply(tradutor.texto3)
 
     const img = await q.download()
     const fileUrl = await uploadImage(img)
-    const banner = await upscaleWithStellar(fileUrl)
 
-    await conn.sendMessage(m.chat, { image: banner }, { quoted: m })
+    const { data } = await axios.get(
+      `https://api.stellarwa.xyz/tools/upscale?url=${fileUrl}&key=BrunoSobrino`,
+      { responseType: "arraybuffer" }
+    )
+
+    await conn.sendMessage(
+      m.chat,
+      { image: Buffer.from(data) },
+      { quoted: m }
+    )
+
   } catch (e) {
-    throw tradutor.texto4 + e
+    console.error(e)
+    m.reply("❌ Error al mejorar la imagen.")
   }
 }
 
 handler.help = ["remini", "hd", "enhance"]
 handler.tags = ["ai", "tools"]
 handler.command = ["remini", "hd", "enhance"]
+
 export default handler
-
-async function upscaleWithStellar(url) {
-  const endpoint = `https://api.stellarwa.xyz/tools/upscale?url=${url}&key=BrunoSobrino`
-
-  const { data } = await axios.get(endpoint, {
-    responseType: "arraybuffer",
-    headers: {
-      accept: "image/*"
-    }
-  })
-
-  return Buffer.from(data)
-}
