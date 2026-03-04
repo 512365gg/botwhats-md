@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 
 global.botnumber = ""
 global.confirmCode = ""
-global.authFile = `MysticSession`;
+global.authFile = `NinoSession`;
 
 // Cambiar a true si el Bot responde a sus comandos con otros comandos.
 // Cambiar a false para usar el Bot desde el mismo numero del Bot.
@@ -16,26 +16,22 @@ global.isBaileysFail = false;
 global.defaultLenguaje = 'es';
 
 global.owner = [
-  ['5219996125657', '👑 Propietario 👑', true],
-  ['5492916450307'],
-  ['5493794297363'],
-  ['59169082575'],
-  ['595972184435'],
-  ['5215533827255']
+  ['51925092348', '👑 Propietario 👑', true],
+  ['584262212498']
 ];
 
-global.suittag = ['5219993404349'];
+global.suittag = ['51925092348'];
 global.prems = [];
 
 // Base Rest Api
 global.BASE_API_DELIRIUS = "https://delirius-apiofc.vercel.app";
 
-global.packname = 'Sticker';
-global.author = 'BrunoSobrino';
-global.wm = 'The Mystic - Bot';
-global.titulowm = 'Mystic Bot';
-global.titulowm2 = `Mystic Bot`
-global.igfg = 'The Mystic';
+global.packname = 'Minoru';
+global.author = 'CID';
+global.wm = 'Nino Nakano - Bot';
+global.titulowm = 'Nino Bot';
+global.titulowm2 = `Nino Bot`
+global.igfg = 'Nino Nakano';
 global.wait = '*_[ ⏳ ] Cargando..._*';
 
 global.imagen1 = fs.readFileSync('./src/assets/images/menu/languages/es/menu.png');
@@ -55,12 +51,12 @@ global.mes = d.toLocaleDateString('es', {month: 'long'});
 global.año = d.toLocaleDateString('es', {year: 'numeric'});
 global.tiempo = d.toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true});
 //* ****************************
-global.wm2 = `${dia} ${fecha}\nThe Mystic - Bot`;
-global.gt = 'The Mystic - Bot';
-global.mysticbot = 'The Mystic - Bot';
+global.wm2 = `${dia} ${fecha}\nNino Nakano - Bot`;
+global.gt = 'Nino Nakano - Bot';
+global.mysticbot = 'Nino Nakano - Bot';
 global.channel = 'https://whatsapp.com/channel/0029Vaein6eInlqIsCXpDs3y';
-global.md = 'https://github.com/BrunoSobrino/TheMystic-Bot-MD';
-global.mysticbot = 'https://github.com/BrunoSobrino/TheMystic-Bot-MD';
+global.md = 'https://github.com/MINORURAKUEN/Best-Nino-MD';
+global.mysticbot = 'https://github.com/MINORURAKUEN/Best-Nino-MD';
 global.waitt = '*_[ ⏳ ] Cargando..._*';
 global.waittt = '*_[ ⏳ ] Cargando..._*';
 global.waitttt = '*_[ ⏳ ] Cargando..._*';
