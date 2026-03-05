@@ -1,25 +1,33 @@
 import fs from "fs"
 import axios from "axios"
-import uploadImage from "../src/libraries/uploadImage.js"
+import { uploadImage } from "../lib/uploadImage.js"
 
 const handler = async (m, { conn, usedPrefix, command }) => {
   try {
+    const user = global.db.data.users[m.sender] || {}
+    const idioma = user.language || global.defaultLenguaje
+
+    const _translate = JSON.parse(
+      fs.readFileSync(`./src/languages/${idioma}.json`)
+    )
+    const tradutor = _translate.plugins.herramientas_hd
+
     const q = m.quoted ? m.quoted : m
     const mime = q.mimetype || q.msg?.mimetype || ""
 
-    if (!mime.startsWith("image/"))
-      throw `Responde a una imagen con ${usedPrefix + command}`
+    if (!mime || !mime.startsWith("image/")) {
+      throw `${tradutor.texto1 || "Responde a una imagen"} ${usedPrefix + command}`
+    }
 
-    m.reply("🪄 Mejorando imagen...")
+    m.reply(tradutor.texto3 || "🪄 Mejorando imagen...")
 
     const img = await q.download()
     const fileUrl = await uploadImage(img)
 
     if (!fileUrl) throw "Error subiendo imagen"
 
-    // API alternativa funcional
     const response = await axios.get(
-      `https://vihangayt.me/tools/upscale?url=${fileUrl}`,
+      `https://api.stellarwa.xyz/tools/upscale?url=${fileUrl}&key=BrunoSobrino`,
       {
         responseType: "arraybuffer",
         validateStatus: () => true
@@ -28,7 +36,7 @@ const handler = async (m, { conn, usedPrefix, command }) => {
 
     if (response.status !== 200) {
       console.log(response.data.toString())
-      throw "La API devolvió error"
+      throw "La API falló"
     }
 
     await conn.sendMessage(
