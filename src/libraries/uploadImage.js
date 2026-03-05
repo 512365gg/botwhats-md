@@ -3,28 +3,37 @@ import { FormData, Blob } from 'formdata-node'
 import { fileTypeFromBuffer } from 'file-type'
 
 export default async function uploadImage(buffer) {
-  const fileType = await fileTypeFromBuffer(buffer)
-  if (!fileType) throw new Error('No se pudo detectar el tipo de archivo')
+  try {
+    const type = await fileTypeFromBuffer(buffer)
+    if (!type) throw new Error('No se pudo detectar el tipo de archivo')
 
-  const { ext, mime } = fileType
+    const { ext, mime } = type
 
-  const form = new FormData()
-  const blob = new Blob([buffer], { type: mime })
+    const form = new FormData()
+    const blob = new Blob([buffer], { type: mime })
 
-  form.append('fileToUpload', blob, `tmp.${ext}`)
-  form.append('reqtype', 'fileupload')
+    form.append('reqtype', 'fileupload')
+    form.append('fileToUpload', blob, `upload.${ext}`)
 
-  const res = await fetch('https://catbox.moe/user/api.php', {
-    method: 'POST',
-    body: form
-  })
+    const response = await fetch('https://catbox.moe/user/api.php', {
+      method: 'POST',
+      body: form
+    })
 
-  const result = await res.text()
+    const text = await response.text()
 
-  if (!result.startsWith('https://files.catbox.moe/')) {
-    console.log(result)
-    throw new Error('Error subiendo a Catbox')
+    if (!response.ok) {
+      throw new Error(`Error HTTP ${response.status}: ${text}`)
+    }
+
+    if (!text.startsWith('https://')) {
+      throw new Error(`Respuesta inválida de Catbox: ${text}`)
+    }
+
+    return text.trim()
+
+  } catch (err) {
+    console.error('Error en uploadImage:', err)
+    throw err
   }
-
-  return result.trim()
 }
